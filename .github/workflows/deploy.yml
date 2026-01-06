@@ -21,11 +21,24 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Prepare site files
+        shell: bash
         run: |
-          mkdir site
+          set -e
+          echo "Repo root contents:"
           ls -la
-          find . -maxdepth 1 -name "*Multimedia*.html"
-          cp "$(find . -maxdepth 1 -name '*Multimedia*.html' | head -n 1)" site/index.html
+
+          echo "Searching for Multimedia App html file..."
+          FILE=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -type f -iname "*multimedia*app*.html" | head -n 1)
+
+          if [ -z "$FILE" ]; then
+            echo "Multimedia App file not found!"
+            exit 1
+          fi
+
+          echo "Found homepage file: $FILE"
+
+          mkdir -p site
+          cp "$FILE" site/index.html
           cp -r CSS JS site/
 
       - uses: actions/upload-pages-artifact@v3
