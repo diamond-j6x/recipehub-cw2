@@ -1,0 +1,24 @@
+name: CI - RecipeHub
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check homepage exists
+        run: |
+          test -f "Multimedia App.html"
+          echo "Homepage found: Multimedia App.html"
+
+      - name: Show project structure
+        run: |
+          ls -la
+          ls -la CSS || true
+          ls -la JS || true
+          ls -la frontend || true
