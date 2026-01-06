@@ -16,13 +16,16 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Prepare site files
         run: |
           mkdir site
-          cp "Multimedia App.html" site/index.html
+          ls -la
+          find . -maxdepth 1 -name "*Multimedia*.html"
+          cp "$(find . -maxdepth 1 -name '*Multimedia*.html' | head -n 1)" site/index.html
           cp -r CSS JS site/
 
       - uses: actions/upload-pages-artifact@v3
