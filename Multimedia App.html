@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RecipeHub – Recipe Sharing Web Application</title>
+
+  <!-- ✅ Bootstrap (local) -->
+  <link rel="stylesheet" href="CSS/bootstrap.min.css">
+  <link rel="stylesheet" href="CSS/bootstrap.css">
+
+  <!-- ✅ Optional overrides -->
+  <link rel="stylesheet" href="CSS/custom.css">
+
+  <style>
+    body { background:#f4f7fb; }
+    .brand { font-size:1.6rem; color:#60a5fa; font-weight:800; }
+    .hero {
+      background:
+        radial-gradient(1000px 400px at 50% 20%, rgba(96,165,250,.35), rgba(0,0,0,0)),
+        linear-gradient(180deg, rgba(2,6,23,.85), rgba(2,6,23,.70));
+    }
+    .cardRound { border-radius:18px; }
+    .heroImgWrap {
+      width:100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 18px;
+      overflow:hidden;
+      background:#e5e7eb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    .heroImgWrap img { width:100%; height:100%; object-fit:cover; display:block; }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="py-3" style="background:#0b1220;">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="brand">RecipeHub</div>
+      <nav>
+        <ul class="d-flex list-unstyled mb-0">
+          <li class="ms-4"><a href="#recipes" class="text-white text-decoration-none">Recipes</a></li>
+          <li class="ms-4"><a href="#create" class="text-white text-decoration-none">Create</a></li>
+          <li class="ms-4"><a href="#edit" class="text-white text-decoration-none">Edit/Delete</a></li>
+          <li class="ms-4"><a href="#media" class="text-white text-decoration-none">Media</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero text-white text-center py-5">
+    <div class="container">
+      <h1 class="fw-bold" style="font-size:2.4rem;">RecipeHub</h1>
+      <p class="mt-2 mb-0" style="color:#e5e7eb; max-width:850px; margin:0 auto;">
+        Recipe sharing platform – create recipes and attach a dish photo during creation.
+      </p>
+    </div>
+  </div>
+
+  <!-- ===================== -->
+  <!-- Recipes (List + Detail) -->
+  <!-- ===================== -->
+  <section id="recipes" class="py-5">
+    <div class="container">
+
+      <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
+        <div>
+          <h2 class="fw-bold mb-1" style="color:#0f172a;">Recipes</h2>
+          <p class="text-muted mb-0">Load recipes, then select one to view details.</p>
+        </div>
+        <button id="btnLoadRecipes" class="btn btn-primary">Load Recipes</button>
+      </div>
+
+      <div class="row g-4">
+        <!-- Left: recipe list -->
+        <div class="col-12 col-lg-4">
+          <div class="card shadow-sm border-0 cardRound">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="fw-bold mb-0" style="font-size:1.2rem; color:#0f172a;">All Recipes</h3>
+                <span class="text-muted small">Select one</span>
+              </div>
+
+              <div id="RecipeList">
+                <p class="text-muted mb-0">Click “Load Recipes”.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: selected recipe detail -->
+        <div class="col-12 col-lg-8">
+          <div class="card shadow-sm border-0 cardRound">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h2 class="fw-bold mb-1" style="font-size:1.4rem; color:#0f172a;">Selected Recipe</h2>
+                  <p class="text-muted mb-0">Dish photo + recipe data</p>
+                </div>
+              </div>
+
+              <div class="row g-4">
+                <div class="col-12 col-lg-5">
+                  <div class="heroImgWrap">
+                    <img id="RecipeHeroImage" alt="Recipe dish" style="display:none;" />
+                    <div id="RecipeHeroPlaceholder" class="text-muted fw-semibold text-center px-3">
+                      Select a recipe to show its dish photo
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-7">
+                  <div id="RecipeDetail" class="text-muted">Select a recipe or use search below.</div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+
+              <div class="row g-3 align-items-end">
+                <div class="col-12 col-lg-8">
+                  <label for="recipeLookup" class="form-label fw-semibold">Get One Recipe (by title)</label>
+                  <input id="recipeLookup" class="form-control" placeholder="Type a recipe title exactly" />
+                </div>
+                <div class="col-12 col-lg-4 d-grid">
+                  <button id="btnGetRecipe" class="btn btn-dark">Get Recipe</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <!-- Create (WITH PHOTO) -->
+  <!-- ===================== -->
+  <section id="create" class="py-5" style="background:#ffffff;">
+    <div class="container">
+
+      <div class="text-center mb-4">
+        <h2 class="fw-bold" style="color:#0f172a;">Create a Recipe</h2>
+        <p class="text-muted mb-0">
+          Fill in the recipe + choose a photo. This will POST the recipe, upload the photo, then attach it (imageUrl).
+        </p>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <div class="col-12 col-lg-8">
+          <div class="card shadow-sm border-0 cardRound">
+            <div class="card-body p-4">
+
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <label for="createTitle" class="form-label fw-semibold">Title</label>
+                  <input id="createTitle" class="form-control" placeholder="Chicken Burger" />
+                </div>
+                <div class="col-12 col-lg-6">
+                  <label for="createDescription" class="form-label fw-semibold">Description</label>
+                  <input id="createDescription" class="form-control" placeholder="Short description" />
+                </div>
+
+                <!-- ✅ NEW: Ingredients -->
+                <div class="col-12">
+                  <label for="createIngredients" class="form-label fw-semibold">Ingredients</label>
+                  <textarea id="createIngredients" rows="2" class="form-control"
+                            placeholder="e.g. Chicken breast, burger buns, lettuce, mayo..."></textarea>
+                </div>
+
+                <!-- ✅ NEW: Prep/Cook/Difficulty -->
+                <div class="col-12 col-lg-4">
+                  <label for="createPrepTime" class="form-label fw-semibold">Prep time (min)</label>
+                  <input id="createPrepTime" type="number" min="0" class="form-control" placeholder="10" />
+                </div>
+
+                <div class="col-12 col-lg-4">
+                  <label for="createCookTime" class="form-label fw-semibold">Cook time (min)</label>
+                  <input id="createCookTime" type="number" min="0" class="form-control" placeholder="12" />
+                </div>
+
+                <div class="col-12 col-lg-4">
+                  <label for="createDifficulty" class="form-label fw-semibold">Difficulty</label>
+                  <select id="createDifficulty" class="form-select">
+                    <option value="Easy" selected>Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
+
+                <div class="col-12">
+                  <label for="createInstructions" class="form-label fw-semibold">Instructions</label>
+                  <textarea id="createInstructions" rows="4" class="form-control" placeholder="Steps..."></textarea>
+                </div>
+
+                <!-- ✅ Photo picker for create stage -->
+                <div class="col-12">
+                  <label for="createPhoto" class="form-label fw-semibold">Recipe Photo (optional)</label>
+                  <input id="createPhoto" type="file" class="form-control" accept="image/*" />
+                  <div class="form-text">Pick an image to upload and attach to the recipe.</div>
+
+                  <img id="createPhotoPreview"
+                       alt="Preview"
+                       style="display:none; margin-top:10px; max-width:260px; border-radius:14px; border:1px solid rgba(15,23,42,.12);" />
+                </div>
+              </div>
+
+              <div class="mt-4 d-flex gap-2 flex-wrap">
+                <button type="button" id="btnCreateRecipe" class="btn btn-primary">Create Recipe</button>
+                <button type="button" id="btnReloadRecipes" class="btn btn-outline-primary">Reload Recipes</button>
+              </div>
+
+              <p class="text-muted mt-3 mb-0">
+                Note: your media upload endpoint must return a filePath/url so the app can auto-attach the image.
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <!-- Edit/Delete -->
+  <!-- ===================== -->
+  <section id="edit" class="py-5">
+    <div class="container">
+
+      <div class="text-center mb-4">
+        <h2 class="fw-bold" style="color:#0f172a;">Edit / Delete</h2>
+        <p class="text-muted mb-0">Select a recipe to auto-fill IDs, then update or delete.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- EDIT -->
+        <div class="col-12 col-lg-6">
+          <div class="card shadow-sm border-0 cardRound">
+            <div class="card-body p-4">
+              <h3 class="fw-bold mb-3" style="font-size:1.2rem; color:#0f172a;">Edit (PUT)</h3>
+
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <label for="editRecipeId" class="form-label fw-semibold">recipeId</label>
+                  <input id="editRecipeId" class="form-control" />
+                </div>
+                <div class="col-12 col-lg-6">
+                  <label for="editItemId" class="form-label fw-semibold">uuid</label>
+                  <input id="editItemId" class="form-control" />
+                </div>
+
+                <div class="col-12 col-lg-6">
+                  <label for="editTitle" class="form-label fw-semibold">Title</label>
+                  <input id="editTitle" class="form-control" />
+                </div>
+                <div class="col-12 col-lg-6">
+                  <label for="editDescription" class="form-label fw-semibold">Description</label>
+                  <input id="editDescription" class="form-control" />
+                </div>
+
+                <div class="col-12">
+                  <label for="editInstructions" class="form-label fw-semibold">Instructions</label>
+                  <textarea id="editInstructions" rows="4" class="form-control"></textarea>
+                </div>
+
+                <div class="col-12">
+                  <label for="editImageUrl" class="form-label fw-semibold">Image URL (imageUrl)</label>
+                  <input id="editImageUrl" class="form-control"
+                         placeholder="Paste the blob image URL for THIS recipe (e.g. .../chickenburger.jpg)" />
+                  <div class="form-text">
+                    Upload an image in Media, copy its URL, paste here, then click Update Recipe.
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 d-grid">
+                <button id="btnUpdateRecipe" class="btn btn-dark">Update Recipe</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- DELETE -->
+        <div class="col-12 col-lg-6">
+          <div class="card shadow-sm border-0 cardRound">
+            <div class="card-body p-4">
+              <h3 class="fw-bold mb-3" style="font-size:1.2rem; color:#0f172a;">Delete (DELETE)</h3>
+
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <label for="deleteRecipeId" class="form-label fw-semibold">recipeId</label>
+                  <input id="deleteRecipeId" class="form-control" />
+                </div>
+                <div class="col-12 col-lg-6">
+                  <label for="deleteItemId" class="form-label fw-semibold">uuid</label>
+                  <input id="deleteItemId" class="form-control" />
+                </div>
+              </div>
+
+              <div class="mt-4 d-flex align-items-center gap-3 flex-wrap">
+                <button id="btnDeleteRecipe" class="btn btn-danger">Delete Recipe</button>
+                <span class="text-muted">Permanent action.</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <!-- Media -->
+  <!-- ===================== -->
+  <section id="media" class="py-5" style="background:#ffffff;">
+    <div class="container">
+
+      <div class="text-center mb-4">
+        <h2 class="fw-bold" style="color:#0f172a;">Media</h2>
+        <p class="text-muted mb-0">Upload files and view the gallery.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-12 col-lg-4">
+          <div class="card shadow-sm border-0 cardRound">
+            <div class="card-body p-4">
+              <h3 class="fw-bold mb-3" style="font-size:1.2rem; color:#0f172a;">Upload (binary)</h3>
+
+              <input id="mediaRecipeId" type="hidden" />
+
+              <label for="userID" class="form-label fw-semibold">x-userid</label>
+              <input id="userID" class="form-control" placeholder="12" />
+
+              <label for="userName" class="form-label fw-semibold mt-3">x-username</label>
+              <input id="userName" class="form-control" placeholder="Joseph" />
+
+              <label for="UpFile" class="form-label fw-semibold mt-3">Choose file(s)</label>
+              <input id="UpFile" type="file" multiple class="form-control" />
+
+              <div class="mt-4 d-flex gap-2 flex-wrap">
+                <button id="btnUploadMedia" class="btn btn-primary">Upload</button>
+                <button id="btnLoadMedia" class="btn btn-outline-dark">Refresh Media</button>
+              </div>
+
+              <p class="text-muted mt-3 mb-0">
+                Tip: Upload images here, then copy the image URL and paste into Edit → Image URL.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+          <div class="card shadow-sm border-0 cardRound">
+            <div class="card-body p-4">
+              <h3 class="fw-bold mb-3" style="font-size:1.2rem; color:#0f172a;">Gallery</h3>
+              <div id="MediaList" class="text-muted">Click “Refresh Media”.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script src="JS/jquery-3.6.0.min.js"></script>
+  <script src="JS/app.js"></script>
+
+  <!-- ✅ Create photo preview -->
+  <script>
+    (function () {
+      const input = document.getElementById("createPhoto");
+      const preview = document.getElementById("createPhotoPreview");
+      if (!input || !preview) return;
+
+      input.addEventListener("change", () => {
+        const f = input.files && input.files[0];
+        if (!f) {
+          preview.style.display = "none";
+          preview.removeAttribute("src");
+          return;
+        }
+        preview.src = URL.createObjectURL(f);
+        preview.style.display = "block";
+      });
+    })();
+  </script>
+
+  <!-- ✅ Reload Recipes button -->
+  <script>
+    (function () {
+      const btn = document.getElementById("btnReloadRecipes");
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        if (typeof loadRecipes === "function") loadRecipes();
+      });
+    })();
+  </script>
+</body>
+</html>
